@@ -32,6 +32,10 @@ Vue.component('column', {
                     <p>Priority: {{ card.priority }}</p>
                     <b>Deadline: {{ card.deadline }}</b>
                     <p>Created at: {{ card.createdAt }}</p>
+                    <p>Last edited:</p>
+                      <div>
+                        <p v-for="(time, tIndex) in card.editTimes" :key="tIndex">{{ time }}</p>
+                      </div>
                     <button @click="startEdit(cIndex)" v-if="show">Edit</button>
                     <button @click="deleteCard(cIndex)" v-if="show" @delete-card="deleteCardByIndex">Delete</button>
                 </div>
@@ -54,12 +58,14 @@ Vue.component('column', {
     },
     methods: {
         addCard(cardItem) {
+        const now = new Date().toLocaleString();
             let newCard = {
                 name: cardItem.name,
                 description: cardItem.description,
                 deadline: cardItem.deadline,
                 priority: cardItem.priority,
                 createdAt: new Date().toLocaleString(),
+                editTimes: []
             };
             this.cards.push(newCard)
             this.$emit('update-cards', this.cards);
@@ -81,15 +87,18 @@ Vue.component('column', {
           this.tempDeadline = card.deadline
         },
         saveEdit(cIndex) {
-          this.cards.splice(cIndex, 1, {
-            name: this.tempName,
-            description: this.tempDescription,
-            priority: this.tempPriority,
-            deadline: this.tempDeadline,
-            createdAt: this.cards[cIndex].createdAt
-          })
-          this.$emit('update-cards', this.cards)
-          this.editingIndex = null
+            const now = new Date().toLocaleString();
+            const card = this.cards[cIndex];
+            card.editTimes.push(now);
+            this.cards.splice(cIndex, 1, {
+                ...card,
+                name: this.tempName,
+                description: this.tempDescription,
+                priority: this.tempPriority,
+                deadline: this.tempDeadline
+            });
+            this.$emit('update-cards', this.cards);
+            this.editingIndex = null;
         },
         cancelEdit() {
           this.editingIndex = null
