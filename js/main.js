@@ -20,6 +20,8 @@ Vue.component('column', {
                 <p>{{ card.description }}</p>
                 <p>Priority: {{ card.priority }}</p>
                 <b>Deadline: {{ card.deadline }}</b>
+                <p>Created at: {{ card.createdAt }}</p>
+                <button @click="deleteCard(cIndex)" @delete-card="deleteCardByIndex">Delete</button>
               </li>
             </ul>
            </div>
@@ -29,16 +31,25 @@ Vue.component('column', {
     </div>
     `,
     methods: {
-    addCard(cardItem) {
+        addCard(cardItem) {
             let newCard = {
                 name: cardItem.name,
                 description: cardItem.description,
                 deadline: cardItem.deadline,
-                priority: cardItem.priority
+                priority: cardItem.priority,
+                createdAt: new Date().toLocaleString(),
             };
             this.cards.push(newCard)
             this.$emit('update-cards', this.cards);
         },
+        deleteCard(index) {
+            this.cards.splice(index, 1);
+            this.$emit('update-cards', this.cards);
+        },
+        deleteCardByIndex(index) {
+            this.cards.splice(index, 1);
+            this.$emit('update-cards', this.cards);
+        }
     },
     computed: {
         sortedCards() {
@@ -111,6 +122,9 @@ Vue.component('card', {
                 this.deadline = null;
                 this.priority = 1;
             }
+        },
+        deleteCard() {
+            this.$emit('delete-card');
         }
     }
 })
