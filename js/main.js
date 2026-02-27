@@ -7,7 +7,7 @@ Vue.component('column', {
         show: {
             type: Boolean,
             default: false
-        }
+        },
     },
     template: `
     <div>
@@ -16,12 +16,25 @@ Vue.component('column', {
             <p v-if="!cards.length" class="noCards">There are no cards yet.</p>
             <ul>
               <li v-for="(card, cIndex) in sortedCards" :key="cIndex" class="cardName">
-                <p><strong>{{ card.name }}</strong></p>
-                <p>{{ card.description }}</p>
-                <p>Priority: {{ card.priority }}</p>
-                <b>Deadline: {{ card.deadline }}</b>
-                <p>Created at: {{ card.createdAt }}</p>
-                <button @click="deleteCard(cIndex)" @delete-card="deleteCardByIndex">Delete</button>
+                <div v-if="editingIndex === cIndex">
+                    <input v-model="tempName" placeholder="Title">
+                    <input v-model="tempDescription" placeholder="Description">
+                    <select v-model.number="tempPriority">
+                      <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+                    </select>
+                    <input type="date" v-model="tempDeadline">
+                    <button @click="saveEdit(cIndex)">Save</button>
+                    <button @click="cancelEdit">Cancel</button>
+                </div>
+                <div v-else>
+                    <p><strong>{{ card.name }}</strong></p>
+                    <p>{{ card.description }}</p>
+                    <p>Priority: {{ card.priority }}</p>
+                    <b>Deadline: {{ card.deadline }}</b>
+                    <p>Created at: {{ card.createdAt }}</p>
+                    <button @click="startEdit(cIndex)" v-if="show">Edit</button>
+                    <button @click="deleteCard(cIndex)" v-if="show" @delete-card="deleteCardByIndex">Delete</button>
+                </div>
               </li>
             </ul>
            </div>
@@ -30,6 +43,15 @@ Vue.component('column', {
 
     </div>
     `,
+    data() {
+        return {
+          editingIndex: null,
+          tempName: '',
+          tempDescription: '',
+          tempPriority: 1,
+          tempDeadline: ''
+        }
+    },
     methods: {
         addCard(cardItem) {
             let newCard = {
@@ -49,6 +71,28 @@ Vue.component('column', {
         deleteCardByIndex(index) {
             this.cards.splice(index, 1);
             this.$emit('update-cards', this.cards);
+        },
+        startEdit(cIndex) {
+          this.editingIndex = cIndex
+          const card = this.cards[cIndex]
+          this.tempName = card.name
+          this.tempDescription = card.description
+          this.tempPriority = card.priority
+          this.tempDeadline = card.deadline
+        },
+        saveEdit(cIndex) {
+          this.cards.splice(cIndex, 1, {
+            name: this.tempName,
+            description: this.tempDescription,
+            priority: this.tempPriority,
+            deadline: this.tempDeadline,
+            createdAt: this.cards[cIndex].createdAt
+          })
+          this.$emit('update-cards', this.cards)
+          this.editingIndex = null
+        },
+        cancelEdit() {
+          this.editingIndex = null
         }
     },
     computed: {
