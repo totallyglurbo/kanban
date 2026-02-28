@@ -13,17 +13,23 @@ initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 </head>
 <body>
     <div id="app">
-        <div>
+        <div class="column">
              <h2>Planned tasks</h2>
             <column :cards="planTasks" :show="true" @move-to-work="moveCardToWork"></column>
         </div>
-       <h2>Tasks to work on</h2>
+        <div class="column">
+            <h2>Tasks to work on</h2>
         <column :cards="workTasks" @move-to-test="moveCardToTest" :work="true"></column>
-        <h2>Tasks to test</h2>
+        </div>
+        <div class="column">
+            <h2>Tasks to test</h2>
         <column :cards="testTasks" @move-to-comp="moveCardToComp" :comp="true"
         @return-to-work="returnFromTestToWork"></column>
-        <h2>Completed tasks</h2>
+        </div>
+       <div class="column">
+           <h2>Completed tasks</h2>
         <column :cards="compTasks" :edit="false"></column>
+       </div>
     </div>
 </body>
 </html>

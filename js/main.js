@@ -53,7 +53,7 @@ Vue.component('column', {
                     <button @click="showReturnReason(cIndex)" v-if="comp">Back to work</button>
                     <div v-if="showReturnDialog">
                       <p>Enter the reason:</p>
-                      <input v-model="reason" placeholder="Причина" />
+                      <input v-model="reason"/>
                       <button @click="submitReturn" :disabled="!reason.trim()">Submit</button>
                       <button @click="showReturnDialog = false">Cancel</button>
                     </div>

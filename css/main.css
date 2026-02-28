@@ -1,0 +1,83 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: url('fonts/Montserrat-Medium.ttf');
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    color: #150801;
+}
+body {
+    display: flex;
+    justify-content: center;
+    padding-top: 2em;
+    padding-bottom: 3em;
+    width: 100vw;
+    min-height: 100vh;
+    background: #dad3cf;
+}
+#app {
+    display: flex;
+    width: 80%;
+    column-gap: 1em;
+}
+.column {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    padding: 2em;
+    width: 30%;
+    background-color: white;
+}
+.column ul {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1em;
+}
+h2 {
+    text-align: center;
+    padding-bottom: 1em;
+}
+ul {
+    padding-bottom: 1em;
+}
+.cardName {
+    list-style-type: none;
+    padding: 10px 10px;
+    border: 1px solid #150801;
+    border-radius: 10px;
+    background-color: white;
+}
+.noCards {
+    text-align: center;
+}
+li {
+    list-style-type: none;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+}
+form > p, form > div {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+#name, #item {
+    border: 1px solid #150801;
+    border-radius: 4px;
+    height: 2em;
+    padding: 3px;
+}
+button, .submit {
+    border: none;
+    background: #dad3cf;
+    padding: 10px 0;
+    border-radius: 10px;
+}
+button:hover, .submit:hover {
+    background: #e4dfdc;
+}
