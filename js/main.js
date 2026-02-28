@@ -8,10 +8,21 @@ Vue.component('column', {
             type: Boolean,
             default: false
         },
+        work: {
+            type: Boolean,
+            default: false
+        },
+        comp: {
+            type: Boolean,
+            default: false
+        },
+        edit: {
+            type: Boolean,
+            default: true
+        }
     },
     template: `
     <div>
-        <h2>New tasks</h2>
         <div>
             <p v-if="!cards.length" class="noCards">There are no cards yet.</p>
             <ul>
@@ -31,12 +42,24 @@ Vue.component('column', {
                     <p>{{ card.description }}</p>
                     <p>Priority: {{ card.priority }}</p>
                     <b>Deadline: {{ card.deadline }}</b>
+                    <p v-if="card.returnReason">Reason: {{ card.returnReason }}</p>
+                    <p v-if="card.deadlineStatus">{{ card.deadlineStatus }}</p>
                     <p>Created at: {{ card.createdAt }}</p>
                     <p>Last edited:</p>
                       <div>
                         <p v-for="(time, tIndex) in card.editTimes" :key="tIndex">{{ time }}</p>
                       </div>
-                    <button @click="startEdit(cIndex)" v-if="show">Edit</button>
+                    <button @click="$emit('move-to-work', cIndex)" v-if="show">To work</button>
+                    <button @click="showReturnReason(cIndex)" v-if="comp">Back to work</button>
+                    <div v-if="showReturnDialog">
+                      <p>Enter the reason:</p>
+                      <input v-model="reason" placeholder="Причина" />
+                      <button @click="submitReturn" :disabled="!reason.trim()">Submit</button>
+                      <button @click="showReturnDialog = false">Cancel</button>
+                    </div>
+                    <button @click="$emit('move-to-test', cIndex)" v-if="work">To test</button>
+                    <button @click="$emit('move-to-comp', cIndex)" v-if="comp">To completed</button>
+                    <button @click="startEdit(cIndex)" v-if="edit">Edit</button>
                     <button @click="deleteCard(cIndex)" v-if="show" @delete-card="deleteCardByIndex">Delete</button>
                 </div>
               </li>
@@ -53,7 +76,10 @@ Vue.component('column', {
           tempName: '',
           tempDescription: '',
           tempPriority: 1,
-          tempDeadline: ''
+          tempDeadline: '',
+          showReturnDialog: false,
+          returnIndex: null,
+          reason: ''
         }
     },
     methods: {
@@ -102,7 +128,16 @@ Vue.component('column', {
         },
         cancelEdit() {
           this.editingIndex = null
-        }
+        },
+        showReturnReason(index) {
+            this.showReturnDialog = true;
+            this.returnIndex = index;
+            this.reason = '';
+          },
+          submitReturn() {
+            this.$emit('return-to-work', this.returnIndex, this.reason);
+            this.showReturnDialog = false;
+          }
     },
     computed: {
         sortedCards() {
@@ -189,4 +224,31 @@ let app = new Vue ({
         testTasks: [],
         compTasks: []
     },
+    methods: {
+          moveCardToWork(index) {
+            const card = this.planTasks.splice(index, 1)[0];
+            this.workTasks.push(card);
+          },
+          moveCardToTest(index) {
+            const card = this.workTasks.splice(index, 1)[0];
+            this.testTasks.push(card);
+          },
+          moveCardToComp(index) {
+            const card = this.testTasks.splice(index, 1)[0];
+            const now = new Date();
+            const deadline = new Date(card.deadline);
+
+          if (deadline < now) {
+            card.deadlineStatus = 'Deadline is overdue';
+          } else {
+            card.deadlineStatus = 'Deadline is not overdue';
+          }
+            this.compTasks.push(card);
+          },
+           returnFromTestToWork(index, reason) {
+            const card = this.testTasks.splice(index, 1)[0];
+            card.returnReason = reason;
+            this.workTasks.push(card);
+          }
+        }
 })
